@@ -76,7 +76,7 @@ func main() {
         print("Error setting password")
         exit(EXIT_FAILURE)
       }
-      print("Key \(key) has been sucessfully set in the keychain")
+      print("Key \(key) has been successfully set in the keychain")
       exit(EXIT_SUCCESS)
     }
     dispatchMain()
@@ -107,7 +107,7 @@ func main() {
           print("Error deleting password")
           exit(EXIT_FAILURE)
         }
-        print("Key \(key) has been sucessfully deleted from the keychain")
+        print("Key \(key) has been successfully deleted from the keychain")
         exit(EXIT_SUCCESS)
       } else {
         let errorDescription = error?.localizedDescription ?? "Unknown error"

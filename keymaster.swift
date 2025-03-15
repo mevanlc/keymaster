@@ -72,12 +72,18 @@ func main() {
 
   if (action == "set") {
     context.evaluatePolicy(policy, localizedReason: "set the password for \(key)") { success, error in
-      guard setPassword(key: key, password: secret) else {
-        print("Error setting password")
+      if success && error == nil {
+        guard setPassword(key: key, password: secret) else {
+          print("Error setting password")
+          exit(EXIT_FAILURE)
+        }
+        print("Key \(key) has been successfully set in the keychain")
+        exit(EXIT_SUCCESS)
+      } else {
+        let errorDescription = error?.localizedDescription ?? "Unknown error"
+        print("Error \(errorDescription)")
         exit(EXIT_FAILURE)
       }
-      print("Key \(key) has been successfully set in the keychain")
-      exit(EXIT_SUCCESS)
     }
     dispatchMain()
   }

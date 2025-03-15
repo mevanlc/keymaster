@@ -71,7 +71,7 @@ func main() {
   }
 
   if (action == "set") {
-    context.evaluatePolicy(policy, localizedReason: "set to your password") { success, error in
+    context.evaluatePolicy(policy, localizedReason: "set the password for \(key)") { success, error in
       guard setPassword(key: key, password: secret) else {
         print("Error setting password")
         exit(EXIT_FAILURE)
@@ -83,7 +83,7 @@ func main() {
   }
 
   if (action == "get") {
-    context.evaluatePolicy(policy, localizedReason: "access to your password") { success, error in
+    context.evaluatePolicy(policy, localizedReason: "access the password for \(key)") { success, error in
       if success && error == nil {
         guard let password = getPassword(key: key) else {
           print("Error getting password")
@@ -101,7 +101,7 @@ func main() {
   }
 
   if (action == "delete") {
-    context.evaluatePolicy(policy, localizedReason: "delete your password") { success, error in
+    context.evaluatePolicy(policy, localizedReason: "delete the password for \(key)") { success, error in
       if success && error == nil {
         guard deletePassword(key: key) else {
           print("Error deleting password")

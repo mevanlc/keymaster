@@ -3,11 +3,20 @@
 import Foundation
 import LocalAuthentication
 
+struct StdErr: TextOutputStream {
+    static var shared: Self = .init()
+    mutating func write(_ string: String) {
+        string.withCString { ptr in
+            _ = fputs(ptr, stderr)
+        }
+    }
+}
+
 let policy = LAPolicy.deviceOwnerAuthenticationWithBiometrics
 
 func setPassword(key: String, password: String) -> Bool {
   guard let passwordData = password.data(using: .utf8) else {
-    print("Error: Failed to convert password string to UTF-8 bytes")
+    print("Error: Failed to convert password string to UTF-8 bytes", to: &StdErr.shared)
     return false
   }
 
@@ -71,7 +80,7 @@ func main() {
 
   var error: NSError?
   guard context.canEvaluatePolicy(policy, error: &error) else {
-    print("This Mac doesn't support deviceOwnerAuthenticationWithBiometrics")
+    print("This Mac doesn't support deviceOwnerAuthenticationWithBiometrics", to: &StdErr.shared)
     exit(EXIT_FAILURE)
   }
 
@@ -79,13 +88,13 @@ func main() {
     context.evaluatePolicy(policy, localizedReason: "set the password for \(key)") { success, error in
       if success && error == nil {
       guard setPassword(key: key, password: secret) else {
-        print("Error setting password")
+        print("Error setting password", to: &StdErr.shared)
         exit(EXIT_FAILURE)
       }
         print("Key \(key) has been successfully set in the keychain")
       exit(EXIT_SUCCESS)
       } else {
-        print("Authentication failed or was canceled: \(error?.localizedDescription ?? "Unknown error")")
+        print("Authentication failed or was canceled: \(error?.localizedDescription ?? "Unknown error")", to: &StdErr.shared)
         exit(EXIT_FAILURE)
       }
     }
@@ -96,14 +105,14 @@ func main() {
     context.evaluatePolicy(policy, localizedReason: "access the password for \(key)") { success, error in
       if success && error == nil {
         guard let password = getPassword(key: key) else {
-          print("Error getting password")
+          print("Error getting password", to: &StdErr.shared)
           exit(EXIT_FAILURE)
         }
         print(password)
         exit(EXIT_SUCCESS)
       } else {
         let errorDescription = error?.localizedDescription ?? "Unknown error"
-        print("Error \(errorDescription)")
+        print("Error \(errorDescription)", to: &StdErr.shared)
         exit(EXIT_FAILURE)
       }
     }
@@ -114,13 +123,13 @@ func main() {
     context.evaluatePolicy(policy, localizedReason: "delete the password for \(key)") { success, error in
       if success && error == nil {
         guard deletePassword(key: key) else {
-          print("Error deleting password")
+          print("Error deleting password", to: &StdErr.shared)
           exit(EXIT_FAILURE)
         }
         print("Key \(key) has been successfully deleted from the keychain")
         exit(EXIT_SUCCESS)
       } else {
-        print("Authentication failed or was canceled: \(error?.localizedDescription ?? "Unknown error")")
+        print("Authentication failed or was canceled: \(error?.localizedDescription ?? "Unknown error")", to: &StdErr.shared)
         exit(EXIT_FAILURE)
       }
     }

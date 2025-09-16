@@ -6,10 +6,15 @@ import LocalAuthentication
 let policy = LAPolicy.deviceOwnerAuthenticationWithBiometrics
 
 func setPassword(key: String, password: String) -> Bool {
+  guard let passwordData = password.data(using: .utf8) else {
+    print("Error: Failed to convert password string to UTF-8 bytes")
+    return false
+  }
+
   let query: [String: Any] = [
     kSecClass as String: kSecClassGenericPassword,
     kSecAttrService as String: key,
-    kSecValueData as String: password.data(using: .utf8)!
+    kSecValueData as String: passwordData
   ]
 
   let status = SecItemAdd(query as CFDictionary, nil)

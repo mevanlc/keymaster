@@ -1,6 +1,7 @@
+
 # Keymaster
 
-Keymaster is a small binary written in Swift that allows scripts to access the Mac Keychain guarded by TouchID.
+Keymaster is a small binary written in Swift that allows scripts to access the macOS Keychain guarded by TouchID.
 
 Macs come with the `security` command which can get and set secrets to the Keychain:
 

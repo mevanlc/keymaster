@@ -49,8 +49,17 @@ func getPassword(key: String) -> String? {
   return password
 }
 
+func readSecret() -> String? {
+  let prompt = "Enter secret: "
+  guard let secret = getpass(prompt) else { return nil }
+  return String(cString: secret)
+}
+
 func usage() {
-  print("keymaster [get|set|delete] [key] [secret]")
+  print("Usage:")
+  print("  keymaster set <key> [secret]")
+  print("  keymaster get <key>")
+  print("  keymaster del <key>")
 }
 
 func main() {
@@ -62,8 +71,16 @@ func main() {
   let action = inputArgs[0]
   let key = inputArgs[1]
   var secret = ""
-  if (action == "set" && inputArgs.count == 3) {
-    secret = inputArgs[2]
+  if (action == "set") {
+    if inputArgs.count == 3 {
+      secret = inputArgs[2]
+    } else {
+      guard let input = readSecret() else {
+        print("Error: Failed to read secret")
+        exit(EXIT_FAILURE)
+      }
+      secret = input
+    }
   }
 
   let context = LAContext()
@@ -110,7 +127,7 @@ func main() {
     dispatchMain()
   }
 
-  if (action == "delete") {
+  if (action == "del" || action == "delete") {
     context.evaluatePolicy(policy, localizedReason: "delete the password for \(key)") { success, error in
       if success && error == nil {
         guard deletePassword(key: key) else {
